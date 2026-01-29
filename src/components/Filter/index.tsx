@@ -10,7 +10,7 @@ type Props = PressableProps & {
 
 export function Filter({ status, isActive, ...rest }: Props) {
     return (
-        <Pressable {...rest} style={({ pressed }) => [
+        <Pressable {...rest} onPress={rest.onPress} style={({ pressed }) => [
             styles.filterContainer,
             { opacity: isActive ? 1 : 0.5 },
             pressed && { opacity: 0.7 },
