@@ -30,6 +30,29 @@ export const styles = StyleSheet.create({
   },
   filters: {
     flexDirection: 'row',
-    gap: 12
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E4E6EC',
+    paddingBottom: 12
+  },
+  clearButton: {
+    marginLeft: 'auto'
+  },
+  clearButtonText: {
+    color: '#828282',
+    fontSize: 12,
+    fontWeight: '600'
+  },
+  separator: {
+    width: '100%',
+    height: 1,
+    backgroundColor: '#EEF0F5',
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#808080',
+    fontSize: 14,
+    fontWeight: '600',
+    marginTop: 32
   }
 });
