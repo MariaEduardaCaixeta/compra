@@ -14,6 +14,8 @@ const ITEMS = [
 ];
 
 export default function Home() {
+  const [activatedStatus, setActivatedStatus] = useState(FilterStatus.PENDING);
+  const [newItemDescription, setNewItemDescription] = useState('');
 
   const handleAdd = () => {
     console.log('Adicionar button pressed');
@@ -27,14 +29,15 @@ export default function Home() {
     console.log('Status change button pressed');
   }
 
-  const [activatedStatus, setActivatedStatus] = useState(FilterStatus.PENDING);
-
   return (
     <View style={styles.container}>
       <Image source={require("@/assets/logo.png")} style={styles.logo} />
 
       <View style={styles.form}>
-        <Input placeholder="O que você precisa comprar?" />
+        <Input placeholder="O que você precisa comprar?" 
+          value={newItemDescription}
+          onChangeText={setNewItemDescription}
+        />
         <Button title="Adicionar" onPress={handleAdd} />
       </View>
 
