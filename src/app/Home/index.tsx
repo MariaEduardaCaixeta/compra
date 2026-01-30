@@ -31,6 +31,8 @@ export default function Home() {
       .then((items) => {
         setNewItemDescription('');
         setItems(items);
+        setActivatedStatus(FilterStatus.PENDING);
+        Alert.alert("Adicionado", `Item "${newItem.description}" adicionado com sucesso!`);
       })
       .catch((error) => {
         console.log('Error saving item:', error);
@@ -38,12 +40,22 @@ export default function Home() {
       });
   }
 
-  const handleRemove = () => {
-    console.log('Remove button pressed');
+  const handleRemove = (itemId: string) => {
+    itemsStorage
+      .remove(itemId)
+      .then((items) => {
+        setItems(items);
+        Alert.alert("Removido", `Item removido com sucesso!`);
+      })
+      .catch((error) => {
+        console.log('Error removing item:', error);
+        Alert.alert('Erro', 'Não foi possível remover o item.');
+      });
   }
 
-  const handleStatusChange = () => {
-    itemsStorage.getByStatus(activatedStatus)
+  const handleListStatusChange = () => {
+    itemsStorage
+      .getByStatus(activatedStatus)
       .then(setItems)
       .catch((error) => {
         console.log('Error fetching items:', error);
@@ -64,7 +76,7 @@ export default function Home() {
 
   // Opção 1
   useEffect(() => {
-    handleStatusChange();
+    handleListStatusChange();
   }, [activatedStatus]);
 
   return (
@@ -103,8 +115,8 @@ export default function Home() {
           renderItem={({ item }) => (
             <Item
               data={item}
-              onRemove={handleRemove}
-              onStatusChange={handleStatusChange}
+              onRemove={() => handleRemove(item.id)}
+              onStatusChange={() => console.log('Status change not implemented')}
             />
           )}
           showsVerticalScrollIndicator={false}
