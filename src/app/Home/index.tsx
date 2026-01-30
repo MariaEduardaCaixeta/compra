@@ -28,9 +28,9 @@ export default function Home() {
 
     itemsStorage
       .add(newItem)
-      .then((items) => {
+      .then(() => {
         setNewItemDescription('');
-        setItems(items);
+        handleListStatusChange();
         setActivatedStatus(FilterStatus.PENDING);
         Alert.alert("Adicionado", `Item "${newItem.description}" adicionado com sucesso!`);
       })
@@ -43,8 +43,8 @@ export default function Home() {
   const handleRemove = (itemId: string) => {
     itemsStorage
       .remove(itemId)
-      .then((items) => {
-        setItems(items);
+      .then(() => {
+        handleListStatusChange();
         Alert.alert("Removido", `Item removido com sucesso!`);
       })
       .catch((error) => {
@@ -66,8 +66,8 @@ export default function Home() {
   const handleItemStatusChange = (id: string) => {
     itemsStorage
       .toggleItemStaus(id)
-      .then((items) => {
-        setItems(items.filter(item => item.status === activatedStatus));
+      .then(() => {
+        handleListStatusChange();
       })
       .catch((error) => {
         console.log('Error toggling item status:', error);
