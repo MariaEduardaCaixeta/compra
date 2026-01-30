@@ -1,24 +1,41 @@
-import { View, Image, Pressable, Text, FlatList } from 'react-native';
+import { View, Image, Pressable, Text, FlatList, Alert } from 'react-native';
 import { styles } from './styles';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Filter } from '@/components/Filter';
 import { FilterStatus } from '@/types/FilterStatus';
 import { Item } from '@/components/Item';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { ItemStorage, itemsStorage } from '@/storage/itemsStorage';
 
 const FILTER_STATUS: FilterStatus[] = [FilterStatus.PENDING, FilterStatus.COMPLETED];
-const ITEMS = [
-  { id: '1', status: FilterStatus.PENDING, description: 'Example item 1' },
-  { id: '2', status: FilterStatus.COMPLETED, description: 'Example item 2' },
-];
 
 export default function Home() {
   const [activatedStatus, setActivatedStatus] = useState(FilterStatus.PENDING);
   const [newItemDescription, setNewItemDescription] = useState('');
+  const [items, setItems] = useState<ItemStorage[]>([]);
 
   const handleAdd = () => {
-    console.log('Adicionar button pressed');
+    if(!newItemDescription.trim()) {
+      return Alert.alert('Descrição vazia', 'Por favor, insira uma descrição para o item.');
+    }
+
+    const newItem: ItemStorage = {
+      id: Math.random().toString(36).substring(2),
+      description: newItemDescription,
+      status: FilterStatus.PENDING,
+    }
+
+    itemsStorage
+      .add(newItem)
+      .then((items) => {
+        setNewItemDescription('');
+        setItems(items);
+      })
+      .catch((error) => {
+        console.log('Error saving item:', error);
+        Alert.alert('Erro', 'Não foi possível adicionar o item.');
+      });
   }
 
   const handleRemove = () => {
@@ -26,8 +43,29 @@ export default function Home() {
   }
 
   const handleStatusChange = () => {
-    console.log('Status change button pressed');
+    itemsStorage.getByStatus(activatedStatus)
+      .then(setItems)
+      .catch((error) => {
+        console.log('Error fetching items:', error);
+        Alert.alert('Erro', 'Não foi possível carregar os itens.');
+      });
+  } 
+
+  // Opção 2
+  async function getItems() {
+    try {
+      const fetchedItems = await itemsStorage.getByStatus(activatedStatus);
+      setItems(fetchedItems);
+    } catch (error) {
+      console.log('Error fetching items:', error);
+      Alert.alert('Erro', 'Não foi possível carregar os itens.');
+    }
   }
+
+  // Opção 1
+  useEffect(() => {
+    handleStatusChange();
+  }, [activatedStatus]);
 
   return (
     <View style={styles.container}>
@@ -60,7 +98,7 @@ export default function Home() {
         </View>
 
         <FlatList
-          data={ITEMS}
+          data={items}
           keyExtractor={item => item.id}
           renderItem={({ item }) => (
             <Item
