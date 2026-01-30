@@ -45,8 +45,31 @@ async function remove(itemId: string): Promise<ItemStorage[]> {
     return updatedItems;
 }
 
+async function clear(): Promise<void> {
+    try {
+        await AsyncStorage.removeItem(ITEMS_STORAGE_KEY);
+    } catch (error) {
+        throw new Error('ITEMS_CLEAR: ' + error);
+    }
+}
+
+async function toggleItemStaus(itemId: string): Promise<ItemStorage[]> {
+    const items = await get();
+    const updatedItems = items.map(item => {
+        if (item.id === itemId) {
+            const newStatus = item.status === FilterStatus.PENDING ? FilterStatus.COMPLETED : FilterStatus.PENDING;
+            return { ...item, status: newStatus };
+        }
+        return item;
+    });
+    await save(updatedItems);
+    return updatedItems;
+}
+
 export const itemsStorage = {
     getByStatus,
     add,
     remove,
+    clear,
+    toggleItemStaus
 };

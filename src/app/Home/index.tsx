@@ -16,7 +16,7 @@ export default function Home() {
   const [items, setItems] = useState<ItemStorage[]>([]);
 
   const handleAdd = () => {
-    if(!newItemDescription.trim()) {
+    if (!newItemDescription.trim()) {
       return Alert.alert('Descrição vazia', 'Por favor, insira uma descrição para o item.');
     }
 
@@ -61,7 +61,43 @@ export default function Home() {
         console.log('Error fetching items:', error);
         Alert.alert('Erro', 'Não foi possível carregar os itens.');
       });
-  } 
+  }
+
+  const handleItemStatusChange = (id: string) => {
+    itemsStorage
+      .toggleItemStaus(id)
+      .then((items) => {
+        setItems(items.filter(item => item.status === activatedStatus));
+      })
+      .catch((error) => {
+        console.log('Error toggling item status:', error);
+        Alert.alert('Erro', 'Não foi possível atualizar o status do item.');
+      });
+  }
+
+  const handleClearItems = () => {
+    Alert.alert("Limpar", "Tem certeza que deseja limpar todos os itens?", [
+      {
+        text: "Cancelar",
+        style: "cancel"
+      },
+      {
+        text: "Sim",
+        onPress: () => {
+          itemsStorage
+            .clear()
+            .then(() => {
+              setItems([]);
+              Alert.alert("Limpo", "Todos os itens foram removidos com sucesso!");
+            })
+            .catch((error) => {
+              console.log('Error clearing items:', error);
+              Alert.alert('Erro', 'Não foi possível limpar os itens.');
+            });
+        }
+      }
+    ]);
+  }
 
   // Opção 2
   async function getItems() {
@@ -84,7 +120,7 @@ export default function Home() {
       <Image source={require("@/assets/logo.png")} style={styles.logo} />
 
       <View style={styles.form}>
-        <Input placeholder="O que você precisa comprar?" 
+        <Input placeholder="O que você precisa comprar?"
           value={newItemDescription}
           onChangeText={setNewItemDescription}
         />
@@ -95,16 +131,16 @@ export default function Home() {
         <View style={styles.filters}>
           {
             FILTER_STATUS.map(status => (
-              <Filter 
-                key={status} 
-                status={status} 
-                isActive={activatedStatus === status} 
+              <Filter
+                key={status}
+                status={status}
+                isActive={activatedStatus === status}
                 onPress={() => setActivatedStatus(status)}
               />
             ))
           }
 
-          <Pressable style={styles.clearButton}>
+          <Pressable style={styles.clearButton} onPress={handleClearItems}>
             <Text style={styles.clearButtonText}>Limpar</Text>
           </Pressable>
         </View>
@@ -116,7 +152,7 @@ export default function Home() {
             <Item
               data={item}
               onRemove={() => handleRemove(item.id)}
-              onStatusChange={() => console.log('Status change not implemented')}
+              onStatusChange={() => handleItemStatusChange(item.id)}
             />
           )}
           showsVerticalScrollIndicator={false}
